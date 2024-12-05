@@ -1,0 +1,46 @@
+name: CI and Docker Build
+
+on:
+  push:
+    branches:
+      - main  # Adjust to your branch name
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 17  # Adjust the Java version if needed
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin' # or adopt
+          java-version: '17'
+
+      - name: Cache Maven dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-m2-
+
+      - name: Build with Maven
+        run: mvn clean install
+
+      - name: Run tests
+        run: mvn test
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }} # Store this in GitHub Secrets
+          password: ${{ secrets.DOCKER_PASSWORD }} # Store this in GitHub Secrets
+
+      - name: Build Docker image
+        run: docker build -t your-dockerhub-username/your-image-name:latest .
+
+      - name: Push Docker image
+        run: docker push your-dockerhub-username/your-image-name:latest
