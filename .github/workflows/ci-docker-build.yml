@@ -40,7 +40,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }} # Store this in GitHub Secrets
 
       - name: Build Docker image
-        run: docker build -t your-dockerhub-username/your-image-name:latest .
+        run: docker build -t karthickas/doctor-service:latest .
 
       - name: Push Docker image
-        run: docker push your-dockerhub-username/your-image-name:latest
+        run: docker push karthickas/doctor-service:latest
